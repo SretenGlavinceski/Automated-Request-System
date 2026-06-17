@@ -1,0 +1,41 @@
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+
+        container_name: requesthub-app
+        restart: unless-stopped
+
+        env_file:
+            - .env.docker
+
+        ports:
+            - "8000:8000"
+
+        volumes:
+            - ./database/database.sqlite:/app/database/database.sqlite
+            - requesthub_storage:/app/storage
+
+    queue:
+        build:
+            context: .
+            dockerfile: Dockerfile
+
+        container_name: requesthub-queue
+        restart: unless-stopped
+
+        command: ["queue"]
+
+        env_file:
+            - .env.docker
+
+        volumes:
+            - ./database/database.sqlite:/app/database/database.sqlite
+            - requesthub_storage:/app/storage
+
+        depends_on:
+            - app
+
+volumes:
+    requesthub_storage:
